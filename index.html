@@ -61,7 +61,7 @@
             margin-bottom: 20px;
         }
         .nickname-input:focus { outline: none; border-color: #667eea; }
-        button[type="submit"] {
+        button {
             width: 100%;
             padding: 15px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -72,10 +72,13 @@
             font-weight: 600;
             cursor: pointer;
             transition: transform 0.2s;
+            margin-bottom: 10px;
         }
-        button[type="submit"]:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4); }
-        button[type="submit"]:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-        .success-section { display: none; }
+        button:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4); }
+        button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        button.secondary { background: #f0f0f0; color: #333; }
+        button.secondary:hover { background: #e0e0e0; transform: none; box-shadow: none; }
+        .success-section, .history-section, .admin-section { display: none; }
         .results-section { margin-top: 30px; padding-top: 30px; border-top: 2px dashed #e1e1e1; }
         .results-title { text-align: center; color: #333; margin-bottom: 20px; font-size: 20px; }
         .result-card {
@@ -88,12 +91,7 @@
         .result-dish-name { font-weight: 600; color: #333; }
         .result-score { font-size: 24px; font-weight: bold; color: #667eea; }
         .result-bar { height: 8px; background: #e1e1e1; border-radius: 4px; overflow: hidden; margin-top: 8px; }
-        .result-bar-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            border-radius: 4px;
-            transition: width 0.5s ease;
-        }
+        .result-bar-fill { height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); border-radius: 4px; transition: width 0.5s ease; }
         .result-stats { display: flex; justify-content: space-between; font-size: 12px; color: #666; margin-top: 8px; }
         .error-message { background: #fee; color: #c00; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; display: none; }
         .current-ratings { background: #fff9e6; border: 2px solid #ffd700; border-radius: 12px; padding: 20px; margin-bottom: 25px; }
@@ -102,21 +100,50 @@
         .mini-result:last-child { border-bottom: none; }
         .mini-score { font-weight: bold; color: #667eea; }
         .loading { text-align: center; padding: 40px; color: #666; }
-        .spinner {
-            width: 40px; height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
-        }
+        .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #667eea; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .loading-overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(255,255,255,0.9);
-            display: none; align-items: center; justify-content: center; flex-direction: column;
-            z-index: 1000;
+        .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: none; align-items: center; justify-content: center; flex-direction: column; z-index: 1000; }
+        
+        /* 历史记录样式 */
+        .history-item {
+            background: #f8f9ff;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-left: 4px solid #667eea;
         }
+        .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .history-user { font-weight: 600; color: #333; }
+        .history-time { font-size: 12px; color: #999; }
+        .history-ratings { display: flex; flex-direction: column; gap: 5px; }
+        .history-rating-item { display: flex; justify-content: space-between; font-size: 14px; }
+        .history-stars { color: #ffc107; }
+        
+        /* 管理界面样式 */
+        .admin-panel {
+            background: #f0f4ff;
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        .admin-panel h3 { color: #333; margin-bottom: 15px; }
+        .admin-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        .admin-input:focus { outline: none; border-color: #667eea; }
+        .dish-edit-row { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
+        .dish-edit-row input { flex: 1; }
+        .dish-edit-row button { width: auto; padding: 10px 15px; margin: 0; }
+        
+        .nav-buttons { display: flex; gap: 10px; margin-top: 20px; }
+        .nav-buttons button { flex: 1; }
+        
         @media (max-width: 600px) { .container { padding: 25px; } .rating-option { font-size: 12px; padding: 8px 3px; } }
     </style>
 </head>
@@ -127,22 +154,40 @@
     </div>
 
     <div class="container">
+        <!-- 评分表单 -->
         <div id="ratingForm">
             <h1>🍽️ 菜品评分</h1>
             <p class="subtitle">请为以下三道菜打分</p>
             
             <div id="errorBox" class="error-message"></div>
 
+            <!-- 管理面板（可编辑菜品名） -->
+            <div class="admin-panel" id="adminPanel" style="display: none;">
+                <h3>⚙️ 编辑菜品名称</h3>
+                <div class="dish-edit-row">
+                    <input type="text" class="admin-input" id="editDish1" placeholder="菜品 1 名称">
+                    <button onclick="saveDishName('dish1')">保存</button>
+                </div>
+                <div class="dish-edit-row">
+                    <input type="text" class="admin-input" id="editDish2" placeholder="菜品 2 名称">
+                    <button onclick="saveDishName('dish2')">保存</button>
+                </div>
+                <div class="dish-edit-row">
+                    <input type="text" class="admin-input" id="editDish3" placeholder="菜品 3 名称">
+                    <button onclick="saveDishName('dish3')">保存</button>
+                </div>
+            </div>
+
             <!-- 显示当前评分 -->
             <div class="current-ratings" id="currentRatings">
                 <h3>📊 当前平均评分</h3>
-                <div class="mini-result"><span>🥗 宫保鸡丁</span><span class="mini-score" id="curr1">加载中...</span></div>
-                <div class="mini-result"><span>🍜 鱼香肉丝</span><span class="mini-score" id="curr2">加载中...</span></div>
-                <div class="mini-result"><span>🍲 麻婆豆腐</span><span class="mini-score" id="curr3">加载中...</span></div>
+                <div class="mini-result"><span class="dish-icon" id="icon1">🥗</span><span class="dish-name-text" id="name1">宫保鸡丁</span><span class="mini-score" id="curr1">加载中...</span></div>
+                <div class="mini-result"><span class="dish-icon" id="icon2">🍜</span><span class="dish-name-text" id="name2">鱼香肉丝</span><span class="mini-score" id="curr2">加载中...</span></div>
+                <div class="mini-result"><span class="dish-icon" id="icon3">🍲</span><span class="dish-name-text" id="name3">麻婆豆腐</span><span class="mini-score" id="curr3">加载中...</span></div>
             </div>
 
             <div class="dish-card">
-                <div class="dish-name"><span>🥗</span><span>宫保鸡丁</span></div>
+                <div class="dish-name"><span class="dish-icon" id="dish1Icon">🥗</span><span class="dish-name-text" id="dish1Name">宫保鸡丁</span></div>
                 <div class="rating-group">
                     <label class="rating-option"><input type="radio" name="dish1" value="1">1 分</label>
                     <label class="rating-option"><input type="radio" name="dish1" value="2">2 分</label>
@@ -153,7 +198,7 @@
             </div>
 
             <div class="dish-card">
-                <div class="dish-name"><span>🍜</span><span>鱼香肉丝</span></div>
+                <div class="dish-name"><span class="dish-icon" id="dish2Icon">🍜</span><span class="dish-name-text" id="dish2Name">鱼香肉丝</span></div>
                 <div class="rating-group">
                     <label class="rating-option"><input type="radio" name="dish2" value="1">1 分</label>
                     <label class="rating-option"><input type="radio" name="dish2" value="2">2 分</label>
@@ -164,7 +209,7 @@
             </div>
 
             <div class="dish-card">
-                <div class="dish-name"><span>🍲</span><span>麻婆豆腐</span></div>
+                <div class="dish-name"><span class="dish-icon" id="dish3Icon">🍲</span><span class="dish-name-text" id="dish3Name">麻婆豆腐</span></div>
                 <div class="rating-group">
                     <label class="rating-option"><input type="radio" name="dish3" value="1">1 分</label>
                     <label class="rating-option"><input type="radio" name="dish3" value="2">2 分</label>
@@ -176,8 +221,14 @@
 
             <input type="text" class="nickname-input" id="nickname" placeholder="你的昵称（可选）" maxlength="20">
             <button type="submit" id="submitBtn" onclick="submitRating()">提交评分</button>
+            
+            <div class="nav-buttons">
+                <button class="secondary" onclick="showHistory()">📜 历史评分</button>
+                <button class="secondary" onclick="toggleAdmin()">⚙️ 管理</button>
+            </div>
         </div>
 
+        <!-- 结果展示 -->
         <div id="results" class="success-section">
             <h1>✅ 评分成功！</h1>
             <p class="subtitle">感谢你的参与</p>
@@ -185,7 +236,43 @@
                 <h2 class="results-title">📊 当前评分结果</h2>
                 <div id="resultsContent"></div>
             </div>
-            <button type="button" onclick="location.reload()" style="margin-top: 20px; background: #f0f0f0; color: #333; width: 100%; padding: 15px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">重新评分</button>
+            <div class="nav-buttons">
+                <button class="secondary" onclick="showHistory()">📜 历史评分</button>
+                <button onclick="location.reload()">重新评分</button>
+            </div>
+        </div>
+
+        <!-- 历史记录 -->
+        <div id="history" class="history-section">
+            <h1>📜 历史评分记录</h1>
+            <p class="subtitle">所有用户的评分详情</p>
+            <div id="historyContent" class="loading">
+                <div class="spinner"></div>
+                <p>加载中...</p>
+            </div>
+            <button class="secondary" onclick="backToForm()" style="margin-top: 20px;">← 返回评分</button>
+        </div>
+
+        <!-- 管理界面 -->
+        <div id="admin" class="admin-section">
+            <h1>⚙️ 管理设置</h1>
+            <p class="subtitle">修改菜品名称和配置</p>
+            <div class="admin-panel">
+                <h3>📝 菜品名称设置</h3>
+                <div class="dish-edit-row">
+                    <input type="text" class="admin-input" id="adminEditDish1" placeholder="菜品 1 名称">
+                    <button onclick="saveDishName('dish1')">保存</button>
+                </div>
+                <div class="dish-edit-row">
+                    <input type="text" class="admin-input" id="adminEditDish2" placeholder="菜品 2 名称">
+                    <button onclick="saveDishName('dish2')">保存</button>
+                </div>
+                <div class="dish-edit-row">
+                    <input type="text" class="admin-input" id="adminEditDish3" placeholder="菜品 3 名称">
+                    <button onclick="saveDishName('dish3')">保存</button>
+                </div>
+            </div>
+            <button class="secondary" onclick="backToForm()" style="margin-top: 20px;">← 返回评分</button>
         </div>
     </div>
 
@@ -196,11 +283,15 @@
         const GET_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`;
         const PUT_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
-        const DISHES = [
+        // 默认菜品配置
+        const DEFAULT_DISHES = [
             { id: 'dish1', name: '宫保鸡丁', icon: '🥗' },
             { id: 'dish2', name: '鱼香肉丝', icon: '🍜' },
             { id: 'dish3', name: '麻婆豆腐', icon: '🍲' }
         ];
+
+        let currentDishes = [...DEFAULT_DISHES];
+        let allData = { ratings: [], dishes: DEFAULT_DISHES };
 
         // 评分选项交互
         document.querySelectorAll('.rating-option').forEach(option => {
@@ -214,35 +305,64 @@
             });
         });
 
-        // 页面加载时获取评分数据
+        // 页面加载
         window.addEventListener('load', () => {
-            loadRatings();
+            loadData();
         });
 
-        // 加载评分数据
-        async function loadRatings() {
-            showLoading(true, '加载评分数据...');
+        // 加载数据
+        async function loadData() {
+            showLoading(true, '加载数据中...');
             try {
                 const response = await fetch(GET_URL, {
-                    headers: {
-                        'X-Master-Key': API_KEY
-                    }
+                    headers: { 'X-Master-Key': API_KEY }
                 });
                 
                 if (!response.ok) throw new Error('获取数据失败');
                 
                 const result = await response.json();
-                const ratings = result.record.ratings || [];
+                allData = result.record;
                 
-                // 显示当前评分
-                updateCurrentRatings(ratings);
+                // 加载菜品配置
+                if (allData.dishes && allData.dishes.length > 0) {
+                    currentDishes = allData.dishes;
+                }
+                
+                // 更新界面
+                updateDishNames();
+                updateCurrentRatings(allData.ratings || []);
                 
             } catch (error) {
                 console.error('Load error:', error);
-                showError('加载失败，请刷新重试');
+                // 使用默认数据
+                updateDishNames();
+                showError('加载失败，使用本地数据');
             } finally {
                 showLoading(false);
             }
+        }
+
+        // 更新菜品名称显示
+        function updateDishNames() {
+            currentDishes.forEach(dish => {
+                // 更新表单中的名称
+                const nameEl = document.getElementById(`${dish.id}Name`);
+                const iconEl = document.getElementById(`${dish.id}Icon`);
+                if (nameEl) nameEl.textContent = dish.name;
+                if (iconEl) iconEl.textContent = dish.icon;
+                
+                // 更新当前评分显示
+                const displayNameEl = document.getElementById(`name${dish.id.slice(-1)}`);
+                const displayIconEl = document.getElementById(`icon${dish.id.slice(-1)}`);
+                if (displayNameEl) displayNameEl.textContent = dish.name;
+                if (displayIconEl) displayIconEl.textContent = dish.icon;
+                
+                // 更新管理面板输入框
+                const editInput = document.getElementById(`edit${dish.id.charAt(0).toUpperCase() + dish.id.slice(1)}`);
+                const adminEditInput = document.getElementById(`adminEdit${dish.id.charAt(0).toUpperCase() + dish.id.slice(1)}`);
+                if (editInput) editInput.value = dish.name;
+                if (adminEditInput) adminEditInput.value = dish.name;
+            });
         }
 
         // 更新当前评分显示
@@ -254,18 +374,19 @@
                 return;
             }
 
-            const avg1 = calcAvg(ratings.map(r => r.dish1));
-            const avg2 = calcAvg(ratings.map(r => r.dish2));
-            const avg3 = calcAvg(ratings.map(r => r.dish3));
-
-            document.getElementById('curr1').textContent = avg1 + ' ⭐';
-            document.getElementById('curr2').textContent = avg2 + ' ⭐';
-            document.getElementById('curr3').textContent = avg3 + ' ⭐';
+            currentDishes.forEach(dish => {
+                const scores = ratings.map(r => r[dish.id]);
+                const avg = calcAvg(scores);
+                const currEl = document.getElementById(`curr${dish.id.slice(-1)}`);
+                if (currEl) currEl.textContent = avg + ' ⭐';
+            });
         }
 
         function calcAvg(scores) {
-            if (scores.length === 0) return '暂无评分';
-            return (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1);
+            if (!scores || scores.length === 0) return '暂无评分';
+            const validScores = scores.filter(s => s !== undefined && s !== null);
+            if (validScores.length === 0) return '暂无评分';
+            return (validScores.reduce((a, b) => a + b, 0) / validScores.length).toFixed(1);
         }
 
         // 提交评分
@@ -288,25 +409,18 @@
                 timestamp: new Date().toISOString()
             };
 
-            // 禁用按钮
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
             submitBtn.textContent = '提交中...';
-
             showLoading(true, '提交评分中...');
 
             try {
-                // 获取当前数据
-                const getResponse = await fetch(GET_URL, {
-                    headers: { 'X-Master-Key': API_KEY }
-                });
+                const getResponse = await fetch(GET_URL, { headers: { 'X-Master-Key': API_KEY } });
                 const currentData = (await getResponse.json()).record;
                 
-                // 添加新评分
                 if (!currentData.ratings) currentData.ratings = [];
                 currentData.ratings.push(ratingData);
 
-                // 更新数据
                 const putResponse = await fetch(PUT_URL, {
                     method: 'PUT',
                     headers: {
@@ -318,7 +432,6 @@
 
                 if (!putResponse.ok) throw new Error('提交失败');
 
-                // 显示结果
                 document.getElementById('ratingForm').style.display = 'none';
                 document.getElementById('results').style.display = 'block';
                 displayResults(currentData.ratings);
@@ -338,9 +451,9 @@
             const container = document.getElementById('resultsContent');
             let html = '';
             
-            DISHES.forEach(dish => {
+            currentDishes.forEach(dish => {
                 const scores = ratings.map(r => r[dish.id]);
-                const avg = scores.length > 0 ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1) : '0.0';
+                const avg = calcAvg(scores);
                 const percentage = (parseFloat(avg) / 5) * 100;
                 
                 html += `
@@ -351,7 +464,7 @@
                         </div>
                         <div class="result-bar"><div class="result-bar-fill" style="width: ${percentage}%"></div></div>
                         <div class="result-stats">
-                            <span>${scores.length} 人评分</span>
+                            <span>${scores.filter(s => s !== undefined).length} 人评分</span>
                             <span>平均分：${avg}/5</span>
                         </div>
                     </div>
@@ -359,6 +472,144 @@
             });
             
             container.innerHTML = html;
+        }
+
+        // 显示历史记录
+        async function showHistory() {
+            document.getElementById('ratingForm').style.display = 'none';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('history').style.display = 'block';
+            
+            showLoading(true, '加载历史记录...');
+            
+            try {
+                const response = await fetch(GET_URL, { headers: { 'X-Master-Key': API_KEY } });
+                const result = await response.json();
+                const ratings = result.record.ratings || [];
+                
+                displayHistory(ratings);
+            } catch (error) {
+                document.getElementById('historyContent').innerHTML = '<p class="error-message">加载失败</p>';
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // 显示历史数据
+        function displayHistory(ratings) {
+            const container = document.getElementById('historyContent');
+            
+            if (ratings.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666; padding: 40px;">暂无评分记录</p>';
+                return;
+            }
+
+            // 按时间倒序排列
+            const sortedRatings = [...ratings].reverse();
+            
+            let html = '';
+            sortedRatings.forEach((rating, index) => {
+                const date = new Date(rating.timestamp).toLocaleString('zh-CN');
+                html += `
+                    <div class="history-item">
+                        <div class="history-header">
+                            <span class="history-user">👤 ${rating.nickname || '匿名'}</span>
+                            <span class="history-time">${date}</span>
+                        </div>
+                        <div class="history-ratings">
+                `;
+                
+                currentDishes.forEach(dish => {
+                    const score = rating[dish.id];
+                    const stars = '★'.repeat(score) + '☆'.repeat(5 - score);
+                    html += `
+                        <div class="history-rating-item">
+                            <span>${dish.icon} ${dish.name}</span>
+                            <span class="history-stars">${stars} (${score}分)</span>
+                        </div>
+                    `;
+                });
+                
+                html += `
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // 切换管理面板
+        function toggleAdmin() {
+            const adminPanel = document.getElementById('adminPanel');
+            adminPanel.style.display = adminPanel.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // 显示管理界面
+        function showAdmin() {
+            document.getElementById('ratingForm').style.display = 'none';
+            document.getElementById('admin').style.display = 'block';
+            updateDishNames();
+        }
+
+        // 保存菜品名称
+        async function saveDishName(dishId) {
+            const editInput = document.getElementById(`edit${dishId.charAt(0).toUpperCase() + dishId.slice(1)}`);
+            const adminEditInput = document.getElementById(`adminEdit${dishId.charAt(0).toUpperCase() + dishId.slice(1)}`);
+            const newName = (editInput?.value || adminEditInput?.value || '').trim();
+            
+            if (!newName) {
+                showError('菜品名称不能为空');
+                return;
+            }
+
+            showLoading(true, '保存中...');
+            
+            try {
+                const getResponse = await fetch(GET_URL, { headers: { 'X-Master-Key': API_KEY } });
+                const currentData = (await getResponse.json()).record;
+                
+                // 更新菜品配置
+                if (!currentData.dishes) currentData.dishes = [...DEFAULT_DISHES];
+                const dishIndex = currentData.dishes.findIndex(d => d.id === dishId);
+                if (dishIndex >= 0) {
+                    currentData.dishes[dishIndex].name = newName;
+                } else {
+                    currentData.dishes.push({ id: dishId, name: newName, icon: DEFAULT_DISHES.find(d => d.id === dishId)?.icon || '🍽️' });
+                }
+                
+                const putResponse = await fetch(PUT_URL, {
+                    method: 'PUT',
+                    headers: {
+                        'X-Master-Key': API_KEY,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(currentData)
+                });
+
+                if (!putResponse.ok) throw new Error('保存失败');
+
+                // 更新本地数据
+                allData = currentData;
+                currentDishes = currentData.dishes;
+                updateDishNames();
+                
+                showError('✅ 保存成功');
+            } catch (error) {
+                console.error('Save error:', error);
+                showError('保存失败：' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // 返回评分表单
+        function backToForm() {
+            document.getElementById('history').style.display = 'none';
+            document.getElementById('admin').style.display = 'none';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('ratingForm').style.display = 'block';
+            updateDishNames();
         }
 
         // 显示加载
