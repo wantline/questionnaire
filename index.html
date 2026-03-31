@@ -74,12 +74,10 @@
         <div id="errorBox" class="error-message"></div>
         <div id="successBox" class="success-message"></div>
 
-        <!-- 首页 -->
-        <div id="homePage" class="page active">
-            <h1>🍽️ 菜品评分系统</h1>
-            <p class="subtitle">请选择您的身份</p>
-            <button class="btn" onclick="goToUserPage()" style="padding: 20px; font-size: 18px;">👤 用户评分</button>
-            <button class="btn btn-secondary" onclick="showAdminLogin()" style="padding: 20px; font-size: 18px;">🔐 管理员入口</button>
+        <!-- 首页（重定向到用户页面） -->
+        <div id="homePage" class="page active" style="text-align: center; padding: 40px;">
+            <div class="spinner" style="margin: 0 auto 20px;"></div>
+            <p style="color: #666;">正在加载...</p>
         </div>
 
         <!-- 管理员登录 -->
@@ -185,7 +183,7 @@
         let allData = { sessions: [], ratings: [] }, currentSession = null;
 
         function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); }
-        function goHome() { showPage('homePage'); clearMessages(); }
+        function goHome() { showPage('userPage'); loadUserPage(); clearMessages(); }
         function goToUserPage() { showPage('userPage'); loadUserPage(); }
         function showAdminLogin() { showPage('adminLoginPage'); document.getElementById('adminPassword').value = ''; }
         
@@ -348,6 +346,13 @@
                 this.classList.add('selected');
                 this.querySelector('input').checked = true;
             });
+        });
+
+        // 页面加载时自动进入用户页面
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                goToUserPage();
+            }, 500);
         });
     </script>
 </body>
