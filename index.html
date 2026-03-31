@@ -3,15 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>用户满意度调查</title>
+    <title>菜品评分</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
@@ -24,105 +20,47 @@
             padding: 40px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
-        h1 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 10px;
-            font-size: 28px;
+        h1 { color: #333; text-align: center; margin-bottom: 10px; font-size: 28px; }
+        .subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 14px; }
+        .dish-card {
+            background: #f8f9ff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 2px solid #e8eaff;
         }
-        .subtitle {
+        .dish-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .rating-group { display: flex; justify-content: space-between; gap: 8px; }
+        .rating-option {
+            flex: 1;
             text-align: center;
-            color: #666;
-            margin-bottom: 30px;
+            padding: 10px 5px;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
             font-size: 14px;
         }
-        .form-group {
-            margin-bottom: 25px;
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: 600;
-            font-size: 15px;
-        }
-        .required {
-            color: #e74c3c;
-        }
-        input[type="text"],
-        input[type="email"],
-        textarea,
-        select {
+        .rating-option:hover { border-color: #667eea; background: #f0f0ff; }
+        .rating-option.selected { border-color: #667eea; background: #667eea; color: white; }
+        .rating-option input { display: none; }
+        .nickname-input {
             width: 100%;
             padding: 12px 16px;
             border: 2px solid #e1e1e1;
             border-radius: 8px;
             font-size: 15px;
-            transition: border-color 0.3s;
+            margin-bottom: 20px;
         }
-        input[type="text"]:focus,
-        input[type="email"]:focus,
-        textarea:focus,
-        select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-        .radio-group,
-        .checkbox-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .radio-option,
-        .checkbox-option {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .radio-option:hover,
-        .checkbox-option:hover {
-            background: #f5f5f5;
-        }
-        input[type="radio"],
-        input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
-        .rating-group {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-        }
-        .rating-option {
-            flex: 1;
-            text-align: center;
-            padding: 12px;
-            border: 2px solid #e1e1e1;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .rating-option:hover {
-            border-color: #667eea;
-            background: #f0f0ff;
-        }
-        .rating-option.selected {
-            border-color: #667eea;
-            background: #667eea;
-            color: white;
-        }
-        .rating-option input {
-            display: none;
-        }
+        .nickname-input:focus { outline: none; border-color: #667eea; }
         button[type="submit"] {
             width: 100%;
             padding: 15px;
@@ -133,165 +71,203 @@
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.2s;
         }
-        button[type="submit"]:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-        }
-        button[type="submit"]:active {
-            transform: translateY(0);
-        }
-        .success-message {
-            display: none;
-            text-align: center;
-            padding: 40px;
-        }
-        .success-message h2 {
-            color: #27ae60;
+        button[type="submit"]:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4); }
+        .success-section { display: none; }
+        .results-section { margin-top: 30px; padding-top: 30px; border-top: 2px dashed #e1e1e1; }
+        .results-title { text-align: center; color: #333; margin-bottom: 20px; font-size: 20px; }
+        .result-card {
+            background: #f8f9ff;
+            border-radius: 12px;
+            padding: 15px;
             margin-bottom: 15px;
         }
-        .success-message p {
-            color: #666;
+        .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .result-dish-name { font-weight: 600; color: #333; }
+        .result-score { font-size: 24px; font-weight: bold; color: #667eea; }
+        .result-bar { height: 8px; background: #e1e1e1; border-radius: 4px; overflow: hidden; margin-top: 8px; }
+        .result-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 4px;
+            transition: width 0.5s ease;
         }
-        @media (max-width: 600px) {
-            .container {
-                padding: 25px;
-            }
-            h1 {
-                font-size: 24px;
-            }
-        }
+        .result-stats { display: flex; justify-content: space-between; font-size: 12px; color: #666; margin-top: 8px; }
+        .error-message { background: #fee; color: #c00; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; display: none; }
+        .current-ratings { background: #fff9e6; border: 2px solid #ffd700; border-radius: 12px; padding: 20px; margin-bottom: 25px; }
+        .current-ratings h3 { color: #333; margin-bottom: 15px; text-align: center; }
+        .mini-result { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee; }
+        .mini-result:last-child { border-bottom: none; }
+        .mini-score { font-weight: bold; color: #667eea; }
+        @media (max-width: 600px) { .container { padding: 25px; } .rating-option { font-size: 12px; padding: 8px 3px; } }
     </style>
 </head>
 <body>
     <div class="container">
-        <form id="questionnaireForm">
-            <h1>📋 用户满意度调查</h1>
-            <p class="subtitle">感谢您的参与，预计需要 3 分钟完成</p>
+        <div id="ratingForm">
+            <h1>🍽️ 菜品评分</h1>
+            <p class="subtitle">请为以下三道菜打分</p>
+            
+            <div id="errorBox" class="error-message"></div>
 
-            <div class="form-group">
-                <label>您的姓名 <span class="required">*</span></label>
-                <input type="text" name="name" required placeholder="请输入您的姓名">
+            <!-- 显示当前评分 -->
+            <div class="current-ratings" id="currentRatings">
+                <h3>📊 当前平均评分</h3>
+                <div class="mini-result"><span>🥗 宫保鸡丁</span><span class="mini-score" id="curr1">暂无评分</span></div>
+                <div class="mini-result"><span>🍜 鱼香肉丝</span><span class="mini-score" id="curr2">暂无评分</span></div>
+                <div class="mini-result"><span>🍲 麻婆豆腐</span><span class="mini-score" id="curr3">暂无评分</span></div>
             </div>
 
-            <div class="form-group">
-                <label>您的邮箱 <span class="required">*</span></label>
-                <input type="email" name="email" required placeholder="example@email.com">
-            </div>
-
-            <div class="form-group">
-                <label>您对我们的服务整体满意度如何？<span class="required">*</span></label>
+            <div class="dish-card">
+                <div class="dish-name"><span class="dish-icon">🥗</span><span>宫保鸡丁</span></div>
                 <div class="rating-group">
-                    <label class="rating-option">
-                        <input type="radio" name="rating" value="1" required>
-                        😞 非常不满意
-                    </label>
-                    <label class="rating-option">
-                        <input type="radio" name="rating" value="2">
-                        😕 不满意
-                    </label>
-                    <label class="rating-option">
-                        <input type="radio" name="rating" value="3">
-                        😐 一般
-                    </label>
-                    <label class="rating-option">
-                        <input type="radio" name="rating" value="4">
-                        🙂 满意
-                    </label>
-                    <label class="rating-option">
-                        <input type="radio" name="rating" value="5">
-                        😊 非常满意
-                    </label>
+                    <label class="rating-option"><input type="radio" name="dish1" value="1">1 分</label>
+                    <label class="rating-option"><input type="radio" name="dish1" value="2">2 分</label>
+                    <label class="rating-option"><input type="radio" name="dish1" value="3">3 分</label>
+                    <label class="rating-option"><input type="radio" name="dish1" value="4">4 分</label>
+                    <label class="rating-option"><input type="radio" name="dish1" value="5">5 分</label>
                 </div>
             </div>
 
-            <div class="form-group">
-                <label>您最喜欢我们的哪方面？<span class="required">*</span></label>
-                <div class="checkbox-group">
-                    <label class="checkbox-option">
-                        <input type="checkbox" name="likes" value="产品质量">
-                        产品质量
-                    </label>
-                    <label class="checkbox-option">
-                        <input type="checkbox" name="likes" value="客户服务">
-                        客户服务
-                    </label>
-                    <label class="checkbox-option">
-                        <input type="checkbox" name="likes" value="价格">
-                        价格
-                    </label>
-                    <label class="checkbox-option">
-                        <input type="checkbox" name="likes" value="交付速度">
-                        交付速度
-                    </label>
-                    <label class="checkbox-option">
-                        <input type="checkbox" name="likes" value="其他">
-                        其他
-                    </label>
+            <div class="dish-card">
+                <div class="dish-name"><span class="dish-icon">🍜</span><span>鱼香肉丝</span></div>
+                <div class="rating-group">
+                    <label class="rating-option"><input type="radio" name="dish2" value="1">1 分</label>
+                    <label class="rating-option"><input type="radio" name="dish2" value="2">2 分</label>
+                    <label class="rating-option"><input type="radio" name="dish2" value="3">3 分</label>
+                    <label class="rating-option"><input type="radio" name="dish2" value="4">4 分</label>
+                    <label class="rating-option"><input type="radio" name="dish2" value="5">5 分</label>
                 </div>
             </div>
 
-            <div class="form-group">
-                <label>您有什么建议或意见？</label>
-                <textarea name="feedback" placeholder="欢迎分享您的想法..."></textarea>
+            <div class="dish-card">
+                <div class="dish-name"><span class="dish-icon">🍲</span><span>麻婆豆腐</span></div>
+                <div class="rating-group">
+                    <label class="rating-option"><input type="radio" name="dish3" value="1">1 分</label>
+                    <label class="rating-option"><input type="radio" name="dish3" value="2">2 分</label>
+                    <label class="rating-option"><input type="radio" name="dish3" value="3">3 分</label>
+                    <label class="rating-option"><input type="radio" name="dish3" value="4">4 分</label>
+                    <label class="rating-option"><input type="radio" name="dish3" value="5">5 分</label>
+                </div>
             </div>
 
-            <div class="form-group">
-                <label>您愿意向朋友推荐我们吗？<span class="required">*</span></label>
-                <select name="recommend" required>
-                    <option value="">请选择</option>
-                    <option value="一定会">一定会</option>
-                    <option value="可能会">可能会</option>
-                    <option value="不确定">不确定</option>
-                    <option value="可能不会">可能不会</option>
-                    <option value="不会">不会</option>
-                </select>
+            <input type="text" class="nickname-input" id="nickname" placeholder="你的昵称（可选）" maxlength="20">
+            <button type="submit" onclick="submitRating()">提交评分</button>
+        </div>
+
+        <div id="results" class="success-section">
+            <h1>✅ 评分成功！</h1>
+            <p class="subtitle">感谢你的参与</p>
+            <div class="results-section">
+                <h2 class="results-title">📊 当前评分结果</h2>
+                <div id="resultsContent"></div>
             </div>
-
-            <button type="submit">提交问卷</button>
-        </form>
-
-        <div class="success-message" id="successMessage">
-            <h2>✅ 提交成功！</h2>
-            <p>感谢您的反馈，我们会认真对待每一条建议。</p>
+            <button type="button" onclick="location.reload()" style="margin-top: 20px; background: #f0f0f0; color: #333; width: 100%; padding: 15px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">重新评分</button>
         </div>
     </div>
 
     <script>
+        const DISHES = [
+            { id: 'dish1', name: '宫保鸡丁', icon: '🥗' },
+            { id: 'dish2', name: '鱼香肉丝', icon: '🍜' },
+            { id: 'dish3', name: '麻婆豆腐', icon: '🍲' }
+        ];
+
         // 评分选项交互
         document.querySelectorAll('.rating-option').forEach(option => {
             option.addEventListener('click', function() {
-                document.querySelectorAll('.rating-option').forEach(o => o.classList.remove('selected'));
+                const groupName = this.querySelector('input').name;
+                document.querySelectorAll(`.rating-option input[name="${groupName}"]`).forEach(o => {
+                    o.closest('.rating-option').classList.remove('selected');
+                });
                 this.classList.add('selected');
                 this.querySelector('input').checked = true;
             });
         });
 
-        // 表单提交
-        document.getElementById('questionnaireForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // 收集表单数据
-            const formData = new FormData(this);
-            const data = Object.fromEntries(formData.entries());
-            
-            // 处理复选框
-            const likes = [];
-            document.querySelectorAll('input[name="likes"]:checked').forEach(cb => {
-                likes.push(cb.value);
-            });
-            data.likes = likes;
-
-            console.log('问卷数据:', data);
-            
-            // 显示成功消息
-            this.style.display = 'none';
-            document.getElementById('successMessage').style.display = 'block';
-            
-            // 这里可以添加实际提交到后端的逻辑
-            // fetch('/api/submit', { method: 'POST', body: JSON.stringify(data) })
+        // 页面加载时显示当前评分
+        window.addEventListener('load', () => {
+            loadCurrentRatings();
         });
+
+        function loadCurrentRatings() {
+            const allRatings = JSON.parse(localStorage.getItem('allRatings') || '[]');
+            if (allRatings.length > 0) {
+                const avg1 = calcAvg(allRatings.map(r => r.dish1));
+                const avg2 = calcAvg(allRatings.map(r => r.dish2));
+                const avg3 = calcAvg(allRatings.map(r => r.dish3));
+                document.getElementById('curr1').textContent = avg1 + ' ⭐';
+                document.getElementById('curr2').textContent = avg2 + ' ⭐';
+                document.getElementById('curr3').textContent = avg3 + ' ⭐';
+            }
+        }
+
+        function calcAvg(scores) {
+            if (scores.length === 0) return '暂无评分';
+            return (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1);
+        }
+
+        function submitRating() {
+            const dish1 = document.querySelector('input[name="dish1"]:checked');
+            const dish2 = document.querySelector('input[name="dish2"]:checked');
+            const dish3 = document.querySelector('input[name="dish3"]:checked');
+            const nickname = document.getElementById('nickname').value.trim();
+
+            if (!dish1 || !dish2 || !dish3) {
+                showError('请为所有菜品打分');
+                return;
+            }
+
+            const ratingData = {
+                dish1: parseInt(dish1.value),
+                dish2: parseInt(dish2.value),
+                dish3: parseInt(dish3.value),
+                nickname: nickname || '匿名',
+                timestamp: new Date().toISOString()
+            };
+
+            // 保存评分
+            let allRatings = JSON.parse(localStorage.getItem('allRatings') || '[]');
+            allRatings.push(ratingData);
+            localStorage.setItem('allRatings', JSON.stringify(allRatings));
+
+            // 显示结果
+            document.getElementById('ratingForm').style.display = 'none';
+            document.getElementById('results').style.display = 'block';
+            displayResults(allRatings);
+        }
+
+        function displayResults(allRatings) {
+            const container = document.getElementById('resultsContent');
+            let html = '';
+            DISHES.forEach(dish => {
+                const scores = allRatings.map(r => r[dish.id]);
+                const avg = scores.length > 0 ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1) : '0.0';
+                const percentage = (parseFloat(avg) / 5) * 100;
+                html += `
+                    <div class="result-card">
+                        <div class="result-header">
+                            <span class="result-dish-name">${dish.icon} ${dish.name}</span>
+                            <span class="result-score">${avg} ⭐</span>
+                        </div>
+                        <div class="result-bar"><div class="result-bar-fill" style="width: ${percentage}%"></div></div>
+                        <div class="result-stats">
+                            <span>${scores.length} 人评分</span>
+                            <span>平均分：${avg}/5</span>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function showError(message) {
+            const errorBox = document.getElementById('errorBox');
+            errorBox.textContent = message;
+            errorBox.style.display = 'block';
+            setTimeout(() => { errorBox.style.display = 'none'; }, 3000);
+        }
     </script>
 </body>
 </html>
