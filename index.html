@@ -2,165 +2,212 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>菜品评分系统</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>菜品评分</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
-        .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 16px; padding: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
-        h1 { color: #333; text-align: center; margin-bottom: 10px; font-size: 28px; }
-        .subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 14px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif; background: #f7f7f7; min-height: 100vh; padding: 20px 16px; }
+        .container { max-width: 600px; margin: 0 auto; background: #fff; border-radius: 12px; padding: 24px 20px; }
+        h1 { color: #111; text-align: center; margin-bottom: 8px; font-size: 22px; font-weight: 600; }
+        .subtitle { text-align: center; color: #888; margin-bottom: 24px; font-size: 14px; }
         .page { display: none; }
         .page.active { display: block; }
-        .dish-card { background: #f8f9ff; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 2px solid #e8eaff; }
-        .dish-name { font-size: 18px; font-weight: 600; color: #333; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
-        .rating-group { display: flex; justify-content: space-between; gap: 8px; }
-        .rating-option { flex: 1; text-align: center; padding: 10px 5px; border: 2px solid #e1e1e1; border-radius: 8px; cursor: pointer; transition: all 0.3s; font-size: 14px; }
-        .rating-option:hover { border-color: #667eea; background: #f0f0ff; }
-        .rating-option.selected { border-color: #667eea; background: #667eea; color: white; }
+        
+        /* 卡片 */
+        .dish-card { background: #f7f7f7; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+        .dish-name { font-size: 16px; font-weight: 500; color: #111; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+        
+        /* 评分选项 */
+        .rating-group { display: flex; justify-content: space-between; gap: 6px; }
+        .rating-option { flex: 1; text-align: center; padding: 10px 4px; background: #fff; border: 1px solid #e5e5e5; border-radius: 6px; cursor: pointer; transition: all 0.2s; font-size: 12px; color: #666; }
+        .rating-option:active { transform: scale(0.95); }
+        .rating-option.selected { border-color: #07C160; background: #07C160; color: #fff; }
         .rating-option input { display: none; }
-        .input-field { width: 100%; padding: 12px 16px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 15px; margin-bottom: 15px; }
-        .input-field:focus { outline: none; border-color: #667eea; }
-        .btn { width: 100%; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: transform 0.2s; margin-bottom: 10px; }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4); }
-        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-        .btn-secondary { background: #f0f0f0; color: #333; }
-        .btn-secondary:hover { background: #e0e0e0; transform: none; box-shadow: none; }
-        .current-ratings { background: #fff9e6; border: 2px solid #ffd700; border-radius: 12px; padding: 20px; margin-bottom: 25px; }
-        .current-ratings h3 { color: #333; margin-bottom: 15px; text-align: center; }
-        .mini-result { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee; }
+        .rating-option span { display: block; line-height: 1.4; }
+        
+        /* 输入框 */
+        .input-field { width: 100%; padding: 12px 16px; background: #f7f7f7; border: none; border-radius: 8px; font-size: 15px; margin-bottom: 16px; color: #111; }
+        .input-field:focus { outline: none; background: #f0f0f0; }
+        .input-field::placeholder { color: #bbb; }
+        
+        /* 按钮 */
+        .btn { width: 100%; padding: 14px; background: #07C160; color: #fff; border: none; border-radius: 8px; font-size: 16px; font-weight: 500; cursor: pointer; transition: opacity 0.2s; margin-bottom: 12px; }
+        .btn:active { opacity: 0.8; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-secondary { background: #f7f7f7; color: #111; }
+        .btn-sm { width: auto; padding: 8px 16px; font-size: 14px; }
+        
+        /* 当前评分 */
+        .current-ratings { background: #fff9e6; border: 1px solid #ffe66d; border-radius: 8px; padding: 16px; margin-bottom: 20px; }
+        .current-ratings h3 { color: #111; margin-bottom: 12px; text-align: center; font-size: 15px; font-weight: 500; }
+        .mini-result { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
         .mini-result:last-child { border-bottom: none; }
-        .mini-score { font-weight: bold; color: #667eea; }
-        .results-section { margin-top: 30px; padding-top: 30px; border-top: 2px dashed #e1e1e1; }
-        .results-title { text-align: center; color: #333; margin-bottom: 20px; font-size: 20px; }
-        .result-card { background: #f8f9ff; border-radius: 12px; padding: 15px; margin-bottom: 15px; }
-        .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .result-dish-name { font-weight: 600; color: #333; }
-        .result-score { font-size: 24px; font-weight: bold; color: #667eea; }
-        .result-bar { height: 8px; background: #e1e1e1; border-radius: 4px; overflow: hidden; margin-top: 8px; }
-        .result-bar-fill { height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); border-radius: 4px; transition: width 0.5s ease; }
-        .result-stats { display: flex; justify-content: space-between; font-size: 12px; color: #666; margin-top: 8px; }
-        .history-item { background: #f8f9ff; border-radius: 12px; padding: 15px; margin-bottom: 12px; border-left: 4px solid #667eea; cursor: pointer; transition: all 0.3s; }
-        .history-item:hover { transform: translateX(5px); }
+        .mini-score { font-weight: 600; color: #07C160; }
+        
+        /* 结果 */
+        .results-section { margin-top: 24px; padding-top: 24px; border-top: 1px dashed #e5e5e5; }
+        .results-title { text-align: center; color: #111; margin-bottom: 16px; font-size: 17px; font-weight: 500; }
+        .result-card { background: #f7f7f7; border-radius: 8px; padding: 14px; margin-bottom: 12px; }
+        .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .result-dish-name { font-weight: 500; color: #111; font-size: 15px; }
+        .result-score { font-size: 20px; font-weight: 600; color: #07C160; }
+        .result-bar { height: 6px; background: #e5e5e5; border-radius: 3px; overflow: hidden; margin-top: 6px; }
+        .result-bar-fill { height: 100%; background: #07C160; border-radius: 3px; transition: width 0.5s ease; }
+        .result-stats { display: flex; justify-content: space-between; font-size: 12px; color: #999; margin-top: 6px; }
+        
+        /* 历史 */
+        .history-item { background: #fff; border-radius: 8px; padding: 16px; margin-bottom: 12px; border-left: 3px solid #07C160; cursor: pointer; transition: all 0.2s; }
+        .history-item:active { background: #f7f7f7; }
         .history-item.collapsed .history-details { display: none; }
         .history-header { display: flex; justify-content: space-between; align-items: center; }
-        .history-title { font-weight: 600; color: #333; }
-        .history-meta { font-size: 12px; color: #999; margin-top: 5px; }
-        .history-details { margin-top: 15px; padding-top: 15px; border-top: 1px dashed #ddd; }
-        .history-ratings { display: flex; flex-direction: column; gap: 8px; }
-        .history-rating-item { display: flex; justify-content: space-between; font-size: 14px; }
+        .history-title { font-weight: 500; color: #111; font-size: 15px; }
+        .history-meta { font-size: 12px; color: #999; margin-top: 6px; }
+        .history-details { margin-top: 12px; padding-top: 12px; border-top: 1px dashed #e5e5e5; }
+        .history-ratings { display: flex; flex-direction: column; gap: 6px; }
+        .history-rating-item { display: flex; justify-content: space-between; font-size: 14px; color: #333; }
         .history-stars { color: #ffc107; }
-        .admin-panel { background: #f0f4ff; border: 2px solid #667eea; border-radius: 12px; padding: 20px; margin-bottom: 25px; }
-        .admin-panel h3 { color: #333; margin-bottom: 15px; }
-        .dish-create-row { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
+        
+        /* 管理 */
+        .admin-panel { background: #f0f9f4; border: 1px solid #07C160; border-radius: 8px; padding: 16px; margin-bottom: 20px; }
+        .admin-panel h3 { color: #111; margin-bottom: 12px; font-size: 15px; font-weight: 500; }
+        .dish-create-row { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
         .dish-create-row input { flex: 1; }
-        .dish-create-row .dish-num { font-weight: bold; color: #667eea; width: 30px; }
+        .dish-create-row .dish-num { font-weight: 600; color: #07C160; width: 24px; font-size: 14px; }
+        
+        /* 加载 */
         .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: none; align-items: center; justify-content: center; flex-direction: column; z-index: 1000; }
-        .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #667eea; border-radius: 50%; animation: spin 1s linear infinite; }
+        .spinner { width: 32px; height: 32px; border: 3px solid #f0f0f0; border-top-color: #07C160; border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .error-message { background: #fee; color: #c00; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; display: none; }
-        .success-message { background: #efe; color: #0a0; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; display: none; }
+        
+        /* 消息 */
+        .error-message { background: #ffe8e8; color: #ff4d4f; padding: 12px; border-radius: 6px; margin-bottom: 16px; text-align: center; font-size: 14px; display: none; }
+        .success-message { background: #e6f9ed; color: #07C160; padding: 12px; border-radius: 6px; margin-bottom: 16px; text-align: center; font-size: 14px; display: none; }
+        
+        /* 导航 */
         .nav-bar { display: flex; gap: 10px; margin-top: 20px; }
         .nav-bar button { flex: 1; }
-        .dish-session-info { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: center; }
-        .dish-session-info h3 { font-size: 16px; margin-bottom: 5px; }
+        
+        /* 菜品信息 */
+        .dish-session-info { background: #07C160; color: #fff; padding: 14px; border-radius: 8px; margin-bottom: 16px; text-align: center; }
+        .dish-session-info h3 { font-size: 15px; margin-bottom: 4px; font-weight: 500; }
         .dish-session-info p { font-size: 12px; opacity: 0.9; }
-        @media (max-width: 600px) { .container { padding: 25px; } .rating-option { font-size: 12px; padding: 8px 3px; } }
+        
+        /* 分割线 */
+        .divider { height: 1px; background: #f0f0f0; margin: 20px 0; }
+        
+        @media (max-width: 375px) {
+            body { padding: 16px 12px; }
+            .container { padding: 20px 16px; }
+            .rating-option { font-size: 11px; padding: 8px 2px; }
+        }
     </style>
 </head>
 <body>
-    <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div><p id="loadingText" style="margin-top: 15px; color: #666;">加载中...</p></div>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <p id="loadingText" style="margin-top: 12px; color: #888; font-size: 14px;">加载中...</p>
+    </div>
+
     <div class="container">
         <div id="errorBox" class="error-message"></div>
         <div id="successBox" class="success-message"></div>
 
-        <!-- 首页（重定向到用户页面） -->
-        <div id="homePage" class="page active" style="text-align: center; padding: 40px;">
-            <div class="spinner" style="margin: 0 auto 20px;"></div>
-            <p style="color: #666;">正在加载...</p>
+        <!-- 首页 -->
+        <div id="homePage" class="page active" style="text-align: center; padding: 40px 20px;">
+            <div class="spinner" style="margin: 0 auto 16px;"></div>
+            <p style="color: #888; font-size: 14px;">正在加载...</p>
         </div>
 
         <!-- 管理员登录 -->
         <div id="adminLoginPage" class="page">
-            <h1>🔐 管理员登录</h1>
+            <h1>管理员登录</h1>
             <p class="subtitle">请输入管理员密码</p>
-            <input type="password" class="input-field" id="adminPassword" placeholder="输入密码" maxlength="8" style="text-align: center; font-size: 18px; letter-spacing: 5px;">
-            <button class="btn" onclick="verifyAdmin()">登录</button>
+            <input type="password" class="input-field" id="adminPassword" placeholder="输入密码" maxlength="8" style="text-align: center; font-size: 18px; letter-spacing: 8px; margin-top: 20px;">
+            <button class="btn" onclick="verifyAdmin()" style="margin-top: 20px;">登录</button>
             <button class="btn btn-secondary" onclick="goHome()">返回</button>
         </div>
 
         <!-- 管理员面板 -->
         <div id="adminPage" class="page">
-            <h1>⚙️ 管理员面板</h1>
+            <h1>管理员面板</h1>
             <p class="subtitle">创建新的菜品评分组合</p>
             <div class="admin-panel">
-                <h3>📝 创建新菜品组合</h3>
+                <h3>创建新菜品组合</h3>
                 <div class="dish-create-row"><span class="dish-num">1</span><input type="text" class="input-field" id="newDish1" placeholder="第一道菜名称" style="margin: 0;"></div>
                 <div class="dish-create-row"><span class="dish-num">2</span><input type="text" class="input-field" id="newDish2" placeholder="第二道菜名称" style="margin: 0;"></div>
                 <div class="dish-create-row"><span class="dish-num">3</span><input type="text" class="input-field" id="newDish3" placeholder="第三道菜名称" style="margin: 0;"></div>
-                <button class="btn" onclick="createNewSession()" style="margin-top: 15px;">✨ 创建新评分组合</button>
+                <button class="btn" onclick="createNewSession()" style="margin-top: 12px;">创建新评分组合</button>
             </div>
-            <h3 style="margin-bottom: 15px; color: #333;">📋 历史菜品组合</h3>
+            <h3 style="margin-bottom: 12px; color: #111; font-size: 15px; font-weight: 500;">历史菜品组合</h3>
             <div id="adminHistoryList"></div>
-            <button class="btn btn-secondary" onclick="goHome()" style="margin-top: 20px;">退出管理</button>
+            <div class="divider"></div>
+            <button class="btn btn-secondary" onclick="goHome()">退出管理</button>
         </div>
 
         <!-- 用户评分页面 -->
         <div id="userPage" class="page">
-            <h1>🍽️ 菜品评分</h1>
+            <h1>菜品评分</h1>
             <p class="subtitle">请为以下菜品打分</p>
+            
             <div class="dish-session-info" id="currentSessionInfo">
                 <h3 id="currentSessionTitle">加载中...</h3>
                 <p id="currentSessionTime">加载中...</p>
             </div>
+            
             <div class="current-ratings" id="currentRatings">
                 <h3>📊 当前平均评分</h3>
                 <div class="mini-result"><span id="currName1">菜名 1</span><span class="mini-score" id="curr1">暂无评分</span></div>
                 <div class="mini-result"><span id="currName2">菜名 2</span><span class="mini-score" id="curr2">暂无评分</span></div>
                 <div class="mini-result"><span id="currName3">菜名 3</span><span class="mini-score" id="curr3">暂无评分</span></div>
             </div>
+
             <div id="ratingForm">
                 <div class="dish-card">
                     <div class="dish-name"><span id="dish1Icon">🥗</span><span id="dish1Name">菜名 1</span></div>
                     <div class="rating-group">
-                        <label class="rating-option"><input type="radio" name="dish1" value="1">😞<br>不好吃</label>
-                        <label class="rating-option"><input type="radio" name="dish1" value="2">😕<br>2 分</label>
-                        <label class="rating-option"><input type="radio" name="dish1" value="3">😐<br>3 分</label>
-                        <label class="rating-option"><input type="radio" name="dish1" value="4">🙂<br>4 分</label>
-                        <label class="rating-option"><input type="radio" name="dish1" value="5">😊<br>超级好吃</label>
+                        <label class="rating-option"><input type="radio" name="dish1" value="1"><span>😞<br>不好吃</span></label>
+                        <label class="rating-option"><input type="radio" name="dish1" value="2"><span>😕<br>2 分</span></label>
+                        <label class="rating-option"><input type="radio" name="dish1" value="3"><span>😐<br>3 分</span></label>
+                        <label class="rating-option"><input type="radio" name="dish1" value="4"><span>🙂<br>4 分</span></label>
+                        <label class="rating-option"><input type="radio" name="dish1" value="5"><span>😊<br>超级好吃</span></label>
                     </div>
                 </div>
+
                 <div class="dish-card">
                     <div class="dish-name"><span id="dish2Icon">🍜</span><span id="dish2Name">菜名 2</span></div>
                     <div class="rating-group">
-                        <label class="rating-option"><input type="radio" name="dish2" value="1">😞<br>不好吃</label>
-                        <label class="rating-option"><input type="radio" name="dish2" value="2">😕<br>2 分</label>
-                        <label class="rating-option"><input type="radio" name="dish2" value="3">😐<br>3 分</label>
-                        <label class="rating-option"><input type="radio" name="dish2" value="4">🙂<br>4 分</label>
-                        <label class="rating-option"><input type="radio" name="dish2" value="5">😊<br>超级好吃</label>
+                        <label class="rating-option"><input type="radio" name="dish2" value="1"><span>😞<br>不好吃</span></label>
+                        <label class="rating-option"><input type="radio" name="dish2" value="2"><span>😕<br>2 分</span></label>
+                        <label class="rating-option"><input type="radio" name="dish2" value="3"><span>😐<br>3 分</span></label>
+                        <label class="rating-option"><input type="radio" name="dish2" value="4"><span>🙂<br>4 分</span></label>
+                        <label class="rating-option"><input type="radio" name="dish2" value="5"><span>😊<br>超级好吃</span></label>
                     </div>
                 </div>
+
                 <div class="dish-card">
                     <div class="dish-name"><span id="dish3Icon">🍲</span><span id="dish3Name">菜名 3</span></div>
                     <div class="rating-group">
-                        <label class="rating-option"><input type="radio" name="dish3" value="1">😞<br>不好吃</label>
-                        <label class="rating-option"><input type="radio" name="dish3" value="2">😕<br>2 分</label>
-                        <label class="rating-option"><input type="radio" name="dish3" value="3">😐<br>3 分</label>
-                        <label class="rating-option"><input type="radio" name="dish3" value="4">🙂<br>4 分</label>
-                        <label class="rating-option"><input type="radio" name="dish3" value="5">😊<br>超级好吃</label>
+                        <label class="rating-option"><input type="radio" name="dish3" value="1"><span>😞<br>不好吃</span></label>
+                        <label class="rating-option"><input type="radio" name="dish3" value="2"><span>😕<br>2 分</span></label>
+                        <label class="rating-option"><input type="radio" name="dish3" value="3"><span>😐<br>3 分</span></label>
+                        <label class="rating-option"><input type="radio" name="dish3" value="4"><span>🙂<br>4 分</span></label>
+                        <label class="rating-option"><input type="radio" name="dish3" value="5"><span>😊<br>超级好吃</span></label>
                     </div>
                 </div>
+
                 <input type="text" class="input-field" id="nickname" placeholder="你的昵称（可选）" maxlength="20">
                 <button class="btn" id="submitBtn" onclick="submitRating()">提交评分</button>
             </div>
+
             <div id="ratingResults" style="display: none;">
-                <h1 style="color: #27ae60;">✅ 评分成功！</h1>
-                <p class="subtitle">感谢你的参与</p>
+                <h1 style="color: #07C160; font-size: 32px; text-align: center; margin-bottom: 8px;">✅</h1>
+                <p class="subtitle">评分成功！感谢你的参与</p>
                 <div class="results-section">
                     <h2 class="results-title">📊 本组菜品评分结果</h2>
                     <div id="resultsContent"></div>
                 </div>
             </div>
+
             <div class="nav-bar">
                 <button class="btn btn-secondary" onclick="showHistory()">📜 历史评分</button>
                 <button class="btn btn-secondary" onclick="showAdminLogin()">🔐 管理员</button>
@@ -169,10 +216,11 @@
 
         <!-- 历史记录页面 -->
         <div id="historyPage" class="page">
-            <h1>📜 历史评分记录</h1>
+            <h1>历史评分记录</h1>
             <p class="subtitle">按创建时间排序</p>
-            <div id="historyContent" style="margin-top: 20px;"></div>
-            <button class="btn btn-secondary" onclick="goToUserPage()" style="margin-top: 20px;">← 返回评分</button>
+            <div id="historyContent" style="margin-top: 16px;"></div>
+            <div class="divider"></div>
+            <button class="btn btn-secondary" onclick="goToUserPage()">返回评分</button>
         </div>
     </div>
 
@@ -283,11 +331,11 @@
             await loadData();
             const sessions = allData.sessions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
             const c = document.getElementById('adminHistoryList');
-            if (sessions.length === 0) { c.innerHTML = '<p style="text-align:center;color:#666;padding:20px;">暂无菜品组合</p>'; return; }
+            if (sessions.length === 0) { c.innerHTML = '<p style="text-align:center;color:#999;padding:20px;font-size:14px;">暂无菜品组合</p>'; return; }
             let html = '';
             sessions.forEach(s => {
                 const sr = allData.ratings.filter(r => r.sessionId === s.id), names = s.dishes.map(d => d.name).join('、');
-                html += `<div class="history-item" style="border-left-color:#764ba2;"><div class="history-header"><div><div class="history-title">📋 ${formatDate(s.createdAt)} 创建</div><div class="history-meta">${names}</div><div class="history-meta">评分数：${sr.length}</div></div></div></div>`;
+                html += `<div class="history-item" style="border-left-color:#07C160;"><div class="history-header"><div><div class="history-title">📋 ${formatDate(s.createdAt)} 创建</div><div class="history-meta">${names}</div><div class="history-meta">评分数：${sr.length}</div></div></div></div>`;
             });
             c.innerHTML = html;
         }
@@ -316,11 +364,11 @@
             await loadData();
             const sessions = allData.sessions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
             const c = document.getElementById('historyContent');
-            if (sessions.length === 0) { c.innerHTML = '<p style="text-align:center;color:#666;padding:40px;">暂无历史记录</p>'; showLoading(false); return; }
+            if (sessions.length === 0) { c.innerHTML = '<p style="text-align:center;color:#999;padding:40px;font-size:14px;">暂无历史记录</p>'; showLoading(false); return; }
             let html = '<div class="history-section">';
             sessions.forEach((s, i) => {
                 const sr = allData.ratings.filter(r => r.sessionId === s.id), isLatest = i === 0;
-                html += `<div class="history-item ${isLatest ? '' : 'collapsed'}" onclick="toggleHistoryItem(this)"><div class="history-header"><div><div class="history-title">${isLatest ? '🔥 ' : '📋 '}第 ${sessions.length - i} 期 - ${formatDate(s.createdAt)}</div><div class="history-meta">${s.dishes.map(d => d.name).join('、')}</div><div class="history-meta">评分数：${sr.length} 人</div></div><span>${isLatest ? '👈 当前' : '▶️ 展开'}</span></div><div class="history-details">`;
+                html += `<div class="history-item ${isLatest ? '' : 'collapsed'}" onclick="toggleHistoryItem(this)"><div class="history-header"><div><div class="history-title">${isLatest ? '🔥 ' : '📋 '}第 ${sessions.length - i} 期 - ${formatDate(s.createdAt)}</div><div class="history-meta">${s.dishes.map(d => d.name).join('、')}</div><div class="history-meta">评分数：${sr.length} 人</div></div><span style="color:#07C160;font-size:13px;">${isLatest ? '当前' : '▶ 展开'}</span></div><div class="history-details">`;
                 s.dishes.forEach((d, j) => {
                     const scores = sr.map(r => r[`dish${j + 1}`]), avg = calcAvg(scores);
                     html += `<div class="history-rating-item"><span>${d.icon} ${d.name}</span><span class="history-stars">${'★'.repeat(Math.round(avg))}${'☆'.repeat(5 - Math.round(avg))} ${avg}</span></div>`;
@@ -332,11 +380,11 @@
             showLoading(false);
         }
 
-        function toggleHistoryItem(el) { el.classList.toggle('collapsed'); const span = el.querySelector('span:last-child'); if (span) span.textContent = el.classList.contains('collapsed') ? '▶️ 展开' : '👁️ 收起'; }
+        function toggleHistoryItem(el) { el.classList.toggle('collapsed'); const span = el.querySelector('span:last-child'); if (span) span.textContent = el.classList.contains('collapsed') ? '▶ 展开' : '✓ 已展开'; }
         function formatDate(iso) { const d = new Date(iso); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; }
         function showLoading(show, text = '加载中...') { const o = document.getElementById('loadingOverlay'), t = document.getElementById('loadingText'); o.style.display = show ? 'flex' : 'none'; if (t) t.textContent = text; }
-        function showError(msg) { const e = document.getElementById('errorBox'); e.textContent = msg; e.style.display = 'block'; setTimeout(() => e.style.display = 'none', 5000); }
-        function showSuccess(msg) { const s = document.getElementById('successBox'); s.textContent = msg; s.style.display = 'block'; setTimeout(() => s.style.display = 'none', 3000); }
+        function showError(msg) { const e = document.getElementById('errorBox'); e.textContent = msg; e.style.display = 'block'; setTimeout(() => e.style.display = 'none', 3000); }
+        function showSuccess(msg) { const s = document.getElementById('successBox'); s.textContent = msg; s.style.display = 'block'; setTimeout(() => s.style.display = 'none', 2000); }
         function clearMessages() { document.getElementById('errorBox').style.display = 'none'; document.getElementById('successBox').style.display = 'none'; }
 
         document.querySelectorAll('.rating-option').forEach(opt => {
@@ -348,12 +396,7 @@
             });
         });
 
-        // 页面加载时自动进入用户页面
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                goToUserPage();
-            }, 500);
-        });
+        window.addEventListener('load', () => { setTimeout(() => { goToUserPage(); }, 300); });
     </script>
 </body>
 </html>
