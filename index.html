@@ -74,6 +74,7 @@
             transition: transform 0.2s;
         }
         button[type="submit"]:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4); }
+        button[type="submit"]:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
         .success-section { display: none; }
         .results-section { margin-top: 30px; padding-top: 30px; border-top: 2px dashed #e1e1e1; }
         .results-title { text-align: center; color: #333; margin-bottom: 20px; font-size: 20px; }
@@ -100,10 +101,31 @@
         .mini-result { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee; }
         .mini-result:last-child { border-bottom: none; }
         .mini-score { font-weight: bold; color: #667eea; }
+        .loading { text-align: center; padding: 40px; color: #666; }
+        .spinner {
+            width: 40px; height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .loading-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255,255,255,0.9);
+            display: none; align-items: center; justify-content: center; flex-direction: column;
+            z-index: 1000;
+        }
         @media (max-width: 600px) { .container { padding: 25px; } .rating-option { font-size: 12px; padding: 8px 3px; } }
     </style>
 </head>
 <body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <p id="loadingText">加载中...</p>
+    </div>
+
     <div class="container">
         <div id="ratingForm">
             <h1>🍽️ 菜品评分</h1>
@@ -114,13 +136,13 @@
             <!-- 显示当前评分 -->
             <div class="current-ratings" id="currentRatings">
                 <h3>📊 当前平均评分</h3>
-                <div class="mini-result"><span>🥗 宫保鸡丁</span><span class="mini-score" id="curr1">暂无评分</span></div>
-                <div class="mini-result"><span>🍜 鱼香肉丝</span><span class="mini-score" id="curr2">暂无评分</span></div>
-                <div class="mini-result"><span>🍲 麻婆豆腐</span><span class="mini-score" id="curr3">暂无评分</span></div>
+                <div class="mini-result"><span>🥗 宫保鸡丁</span><span class="mini-score" id="curr1">加载中...</span></div>
+                <div class="mini-result"><span>🍜 鱼香肉丝</span><span class="mini-score" id="curr2">加载中...</span></div>
+                <div class="mini-result"><span>🍲 麻婆豆腐</span><span class="mini-score" id="curr3">加载中...</span></div>
             </div>
 
             <div class="dish-card">
-                <div class="dish-name"><span class="dish-icon">🥗</span><span>宫保鸡丁</span></div>
+                <div class="dish-name"><span>🥗</span><span>宫保鸡丁</span></div>
                 <div class="rating-group">
                     <label class="rating-option"><input type="radio" name="dish1" value="1">1 分</label>
                     <label class="rating-option"><input type="radio" name="dish1" value="2">2 分</label>
@@ -131,7 +153,7 @@
             </div>
 
             <div class="dish-card">
-                <div class="dish-name"><span class="dish-icon">🍜</span><span>鱼香肉丝</span></div>
+                <div class="dish-name"><span>🍜</span><span>鱼香肉丝</span></div>
                 <div class="rating-group">
                     <label class="rating-option"><input type="radio" name="dish2" value="1">1 分</label>
                     <label class="rating-option"><input type="radio" name="dish2" value="2">2 分</label>
@@ -142,7 +164,7 @@
             </div>
 
             <div class="dish-card">
-                <div class="dish-name"><span class="dish-icon">🍲</span><span>麻婆豆腐</span></div>
+                <div class="dish-name"><span>🍲</span><span>麻婆豆腐</span></div>
                 <div class="rating-group">
                     <label class="rating-option"><input type="radio" name="dish3" value="1">1 分</label>
                     <label class="rating-option"><input type="radio" name="dish3" value="2">2 分</label>
@@ -153,7 +175,7 @@
             </div>
 
             <input type="text" class="nickname-input" id="nickname" placeholder="你的昵称（可选）" maxlength="20">
-            <button type="submit" onclick="submitRating()">提交评分</button>
+            <button type="submit" id="submitBtn" onclick="submitRating()">提交评分</button>
         </div>
 
         <div id="results" class="success-section">
@@ -168,6 +190,12 @@
     </div>
 
     <script>
+        // JSONBin.io 配置
+        const BIN_ID = '69cb3f9036566621a86444cb';
+        const API_KEY = '$2a$10$WUlJRiI04FTVn9Anl5Hm7uH.AaMS.SuKuyIy0IH3pDL/.xWUQTJ3C';
+        const GET_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`;
+        const PUT_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+
         const DISHES = [
             { id: 'dish1', name: '宫保鸡丁', icon: '🥗' },
             { id: 'dish2', name: '鱼香肉丝', icon: '🍜' },
@@ -186,21 +214,53 @@
             });
         });
 
-        // 页面加载时显示当前评分
+        // 页面加载时获取评分数据
         window.addEventListener('load', () => {
-            loadCurrentRatings();
+            loadRatings();
         });
 
-        function loadCurrentRatings() {
-            const allRatings = JSON.parse(localStorage.getItem('allRatings') || '[]');
-            if (allRatings.length > 0) {
-                const avg1 = calcAvg(allRatings.map(r => r.dish1));
-                const avg2 = calcAvg(allRatings.map(r => r.dish2));
-                const avg3 = calcAvg(allRatings.map(r => r.dish3));
-                document.getElementById('curr1').textContent = avg1 + ' ⭐';
-                document.getElementById('curr2').textContent = avg2 + ' ⭐';
-                document.getElementById('curr3').textContent = avg3 + ' ⭐';
+        // 加载评分数据
+        async function loadRatings() {
+            showLoading(true, '加载评分数据...');
+            try {
+                const response = await fetch(GET_URL, {
+                    headers: {
+                        'X-Master-Key': API_KEY
+                    }
+                });
+                
+                if (!response.ok) throw new Error('获取数据失败');
+                
+                const result = await response.json();
+                const ratings = result.record.ratings || [];
+                
+                // 显示当前评分
+                updateCurrentRatings(ratings);
+                
+            } catch (error) {
+                console.error('Load error:', error);
+                showError('加载失败，请刷新重试');
+            } finally {
+                showLoading(false);
             }
+        }
+
+        // 更新当前评分显示
+        function updateCurrentRatings(ratings) {
+            if (ratings.length === 0) {
+                document.getElementById('curr1').textContent = '暂无评分';
+                document.getElementById('curr2').textContent = '暂无评分';
+                document.getElementById('curr3').textContent = '暂无评分';
+                return;
+            }
+
+            const avg1 = calcAvg(ratings.map(r => r.dish1));
+            const avg2 = calcAvg(ratings.map(r => r.dish2));
+            const avg3 = calcAvg(ratings.map(r => r.dish3));
+
+            document.getElementById('curr1').textContent = avg1 + ' ⭐';
+            document.getElementById('curr2').textContent = avg2 + ' ⭐';
+            document.getElementById('curr3').textContent = avg3 + ' ⭐';
         }
 
         function calcAvg(scores) {
@@ -208,7 +268,8 @@
             return (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1);
         }
 
-        function submitRating() {
+        // 提交评分
+        async function submitRating() {
             const dish1 = document.querySelector('input[name="dish1"]:checked');
             const dish2 = document.querySelector('input[name="dish2"]:checked');
             const dish3 = document.querySelector('input[name="dish3"]:checked');
@@ -227,24 +288,61 @@
                 timestamp: new Date().toISOString()
             };
 
-            // 保存评分
-            let allRatings = JSON.parse(localStorage.getItem('allRatings') || '[]');
-            allRatings.push(ratingData);
-            localStorage.setItem('allRatings', JSON.stringify(allRatings));
+            // 禁用按钮
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = '提交中...';
 
-            // 显示结果
-            document.getElementById('ratingForm').style.display = 'none';
-            document.getElementById('results').style.display = 'block';
-            displayResults(allRatings);
+            showLoading(true, '提交评分中...');
+
+            try {
+                // 获取当前数据
+                const getResponse = await fetch(GET_URL, {
+                    headers: { 'X-Master-Key': API_KEY }
+                });
+                const currentData = (await getResponse.json()).record;
+                
+                // 添加新评分
+                if (!currentData.ratings) currentData.ratings = [];
+                currentData.ratings.push(ratingData);
+
+                // 更新数据
+                const putResponse = await fetch(PUT_URL, {
+                    method: 'PUT',
+                    headers: {
+                        'X-Master-Key': API_KEY,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(currentData)
+                });
+
+                if (!putResponse.ok) throw new Error('提交失败');
+
+                // 显示结果
+                document.getElementById('ratingForm').style.display = 'none';
+                document.getElementById('results').style.display = 'block';
+                displayResults(currentData.ratings);
+
+            } catch (error) {
+                console.error('Submit error:', error);
+                showError('提交失败：' + error.message);
+                submitBtn.disabled = false;
+                submitBtn.textContent = '提交评分';
+            } finally {
+                showLoading(false);
+            }
         }
 
-        function displayResults(allRatings) {
+        // 显示结果
+        function displayResults(ratings) {
             const container = document.getElementById('resultsContent');
             let html = '';
+            
             DISHES.forEach(dish => {
-                const scores = allRatings.map(r => r[dish.id]);
+                const scores = ratings.map(r => r[dish.id]);
                 const avg = scores.length > 0 ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1) : '0.0';
                 const percentage = (parseFloat(avg) / 5) * 100;
+                
                 html += `
                     <div class="result-card">
                         <div class="result-header">
@@ -259,14 +357,24 @@
                     </div>
                 `;
             });
+            
             container.innerHTML = html;
         }
 
+        // 显示加载
+        function showLoading(show, text = '加载中...') {
+            const overlay = document.getElementById('loadingOverlay');
+            const textEl = document.getElementById('loadingText');
+            overlay.style.display = show ? 'flex' : 'none';
+            textEl.textContent = text;
+        }
+
+        // 显示错误
         function showError(message) {
             const errorBox = document.getElementById('errorBox');
             errorBox.textContent = message;
             errorBox.style.display = 'block';
-            setTimeout(() => { errorBox.style.display = 'none'; }, 3000);
+            setTimeout(() => { errorBox.style.display = 'none'; }, 5000);
         }
     </script>
 </body>
