@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户满意度调查</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .form-group {
+            margin-bottom: 25px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 15px;
+        }
+        .required {
+            color: #e74c3c;
+        }
+        input[type="text"],
+        input[type="email"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .radio-group,
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .radio-option,
+        .checkbox-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .radio-option:hover,
+        .checkbox-option:hover {
+            background: #f5f5f5;
+        }
+        input[type="radio"],
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .rating-group {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .rating-option {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .rating-option:hover {
+            border-color: #667eea;
+            background: #f0f0ff;
+        }
+        .rating-option.selected {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+        .rating-option input {
+            display: none;
+        }
+        button[type="submit"] {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        button[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        button[type="submit"]:active {
+            transform: translateY(0);
+        }
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        .success-message h2 {
+            color: #27ae60;
+            margin-bottom: 15px;
+        }
+        .success-message p {
+            color: #666;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <form id="questionnaireForm">
+            <h1>📋 用户满意度调查</h1>
+            <p class="subtitle">感谢您的参与，预计需要 3 分钟完成</p>
+
+            <div class="form-group">
+                <label>您的姓名 <span class="required">*</span></label>
+                <input type="text" name="name" required placeholder="请输入您的姓名">
+            </div>
+
+            <div class="form-group">
+                <label>您的邮箱 <span class="required">*</span></label>
+                <input type="email" name="email" required placeholder="example@email.com">
+            </div>
+
+            <div class="form-group">
+                <label>您对我们的服务整体满意度如何？<span class="required">*</span></label>
+                <div class="rating-group">
+                    <label class="rating-option">
+                        <input type="radio" name="rating" value="1" required>
+                        😞 非常不满意
+                    </label>
+                    <label class="rating-option">
+                        <input type="radio" name="rating" value="2">
+                        😕 不满意
+                    </label>
+                    <label class="rating-option">
+                        <input type="radio" name="rating" value="3">
+                        😐 一般
+                    </label>
+                    <label class="rating-option">
+                        <input type="radio" name="rating" value="4">
+                        🙂 满意
+                    </label>
+                    <label class="rating-option">
+                        <input type="radio" name="rating" value="5">
+                        😊 非常满意
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>您最喜欢我们的哪方面？<span class="required">*</span></label>
+                <div class="checkbox-group">
+                    <label class="checkbox-option">
+                        <input type="checkbox" name="likes" value="产品质量">
+                        产品质量
+                    </label>
+                    <label class="checkbox-option">
+                        <input type="checkbox" name="likes" value="客户服务">
+                        客户服务
+                    </label>
+                    <label class="checkbox-option">
+                        <input type="checkbox" name="likes" value="价格">
+                        价格
+                    </label>
+                    <label class="checkbox-option">
+                        <input type="checkbox" name="likes" value="交付速度">
+                        交付速度
+                    </label>
+                    <label class="checkbox-option">
+                        <input type="checkbox" name="likes" value="其他">
+                        其他
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>您有什么建议或意见？</label>
+                <textarea name="feedback" placeholder="欢迎分享您的想法..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>您愿意向朋友推荐我们吗？<span class="required">*</span></label>
+                <select name="recommend" required>
+                    <option value="">请选择</option>
+                    <option value="一定会">一定会</option>
+                    <option value="可能会">可能会</option>
+                    <option value="不确定">不确定</option>
+                    <option value="可能不会">可能不会</option>
+                    <option value="不会">不会</option>
+                </select>
+            </div>
+
+            <button type="submit">提交问卷</button>
+        </form>
+
+        <div class="success-message" id="successMessage">
+            <h2>✅ 提交成功！</h2>
+            <p>感谢您的反馈，我们会认真对待每一条建议。</p>
+        </div>
+    </div>
+
+    <script>
+        // 评分选项交互
+        document.querySelectorAll('.rating-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.rating-option').forEach(o => o.classList.remove('selected'));
+                this.classList.add('selected');
+                this.querySelector('input').checked = true;
+            });
+        });
+
+        // 表单提交
+        document.getElementById('questionnaireForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // 收集表单数据
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries());
+            
+            // 处理复选框
+            const likes = [];
+            document.querySelectorAll('input[name="likes"]:checked').forEach(cb => {
+                likes.push(cb.value);
+            });
+            data.likes = likes;
+
+            console.log('问卷数据:', data);
+            
+            // 显示成功消息
+            this.style.display = 'none';
+            document.getElementById('successMessage').style.display = 'block';
+            
+            // 这里可以添加实际提交到后端的逻辑
+            // fetch('/api/submit', { method: 'POST', body: JSON.stringify(data) })
+        });
+    </script>
+</body>
+</html>
